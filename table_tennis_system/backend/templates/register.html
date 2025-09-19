@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 乒乓球培训管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 100%;
+            margin: 2rem;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 2rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .user-type-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-type-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .user-type-card:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .user-type-card.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .user-type-card i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .error-message, .success-message {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container fade-in-up">
+        <div class="logo">
+            <i class="fas fa-table-tennis"></i>
+        </div>
+        <h1 class="title">用户注册</h1>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+
+        <form id="registerForm">
+            <div class="mb-3">
+                <input type="text" class="form-control" id="username" placeholder="用户名" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="password" placeholder="密码" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="确认密码" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="realName" placeholder="真实姓名" required>
+            </div>
+            <div class="mb-3">
+                <input type="email" class="form-control" id="email" placeholder="邮箱">
+            </div>
+            <div class="mb-3">
+                <input type="tel" class="form-control" id="phone" placeholder="手机号码">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">性别：</label>
+                <select class="form-select" id="gender" required>
+                    <option value="">请选择性别</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">年龄：</label>
+                <input type="number" class="form-control" id="age" placeholder="年龄" min="6" max="100">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">校区：</label>
+                <select class="form-select" id="campus" required>
+                    <option value="">请选择校区</option>
+                    <!-- 动态加载校区选项 -->
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">选择用户类型：</label>
+                <div class="user-type-cards">
+                    <div class="user-type-card" data-type="student">
+                        <i class="fas fa-user-graduate"></i>
+                        <div><strong>学员</strong></div>
+                        <small>预约课程，学习技能</small>
+                    </div>
+                    <div class="user-type-card" data-type="coach">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <div><strong>教练</strong></div>
+                        <small>教授课程，管理学员</small>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-register" id="registerBtn">
+                <i class="fas fa-user-plus me-2"></i>注册
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/login">
+                <i class="fas fa-sign-in-alt me-2"></i>已有账户？立即登录
+            </a>
+            <br><br>
+            <a href="/">
+                <i class="fas fa-arrow-left me-2"></i>返回首页
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:5001/api';
+        let selectedUserType = '';
+
+        // 页面加载时获取校区列表
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadCampusList();
+        });
+
+        // 加载校区列表
+        async function loadCampusList() {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/user/campus`);
+                if (response.data.success) {
+                    const campusSelect = document.getElementById('campus');
+                    const campuses = response.data.data || [];
+
+                    campuses.forEach(campus => {
+                        const option = document.createElement('option');
+                        option.value = campus.id;
+                        option.textContent = campus.name;
+                        campusSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('加载校区列表失败:', error);
+                showError('无法加载校区列表，请刷新页面重试');
+            }
+        }
+
+        // 用户类型选择
+        document.querySelectorAll('.user-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedUserType = this.dataset.type;
+            });
+        });
+
+        // 显示错误消息
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // 隐藏消息
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // 表单验证
+        function validateForm() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const realName = document.getElementById('realName').value.trim();
+            const gender = document.getElementById('gender').value;
+            const campus = document.getElementById('campus').value;
+
+            if (!username || username.length < 3) {
+                showError('用户名长度至少3个字符');
+                return false;
+            }
+
+            if (!password || password.length < 6) {
+                showError('密码长度至少6个字符');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showError('两次输入的密码不一致');
+                return false;
+            }
+
+            if (!realName) {
+                showError('请输入真实姓名');
+                return false;
+            }
+
+            if (!gender) {
+                showError('请选择性别');
+                return false;
+            }
+
+            if (!campus) {
+                showError('请选择校区');
+                return false;
+            }
+
+            if (!selectedUserType) {
+                showError('请选择用户类型');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 注册表单提交
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideMessages();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value,
+                real_name: document.getElementById('realName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                gender: document.getElementById('gender').value,
+                age: document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null,
+                campus_id: parseInt(document.getElementById('campus').value),
+                user_type: selectedUserType
+            };
+
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>注册中...';
+
+            try {
+                const response = await axios.post(`${API_BASE_URL}/auth/register`, formData);
+
+                if (response.data.success) {
+                    showSuccess('注册成功！3秒后跳转到登录页面...');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 3000);
+                } else {
+                    showError(response.data.message || '注册失败');
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                if (error.response && error.response.data) {
+                    showError(error.response.data.message || '注册失败');
+                } else {
+                    showError('网络连接失败，请检查网络设置');
+                }
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i>注册';
+            }
+        });
+    </script>
+</body>
+</html>

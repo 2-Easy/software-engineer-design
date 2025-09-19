@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员仪表板 - 乒乓球培训管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            border-radius: 0.375rem;
+            margin: 0.125rem 0;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card-stat {
+            border-left: 4px solid #007bff;
+        }
+        .table-responsive {
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-table-tennis text-primary me-2"></i>
+                    <h5 class="mb-0">学员中心</h5>
+                </div>
+                <hr>
+                <nav class="nav nav-pills flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt me-2"></i>仪表板
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('coaches')">
+                        <i class="fas fa-users me-2"></i>选择教练
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('bookings')">
+                        <i class="fas fa-calendar-alt me-2"></i>我的预约
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('account')">
+                        <i class="fas fa-credit-card me-2"></i>账户管理
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('matches')">
+                        <i class="fas fa-trophy me-2"></i>比赛报名
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('profile')">
+                        <i class="fas fa-user me-2"></i>个人资料
+                    </a>
+                </nav>
+                <hr>
+                <div class="mt-auto">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="https://via.placeholder.com/32" class="rounded-circle me-2" alt="头像">
+                        <span id="userName">加载中...</span>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>退出登录
+                    </button>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- 仪表板 -->
+                <div id="dashboardSection" class="section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>仪表板</h2>
+                        <span class="text-muted" id="currentTime"></span>
+                    </div>
+
+                    <!-- 统计卡片 -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card card-stat">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">选择的教练</h6>
+                                            <h3 class="mb-0" id="coachCount">-</h3>
+                                        </div>
+                                        <i class="fas fa-user-tie fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">待确认预约</h6>
+                                            <h3 class="mb-0" id="pendingBookings">-</h3>
+                                        </div>
+                                        <i class="fas fa-clock fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">账户余额</h6>
+                                            <h3 class="mb-0" id="accountBalance">-</h3>
+                                        </div>
+                                        <i class="fas fa-wallet fa-2x text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">本月课程</h6>
+                                            <h3 class="mb-0" id="monthlyLessons">-</h3>
+                                        </div>
+                                        <i class="fas fa-calendar fa-2x text-info"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 近期预约 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">近期预约</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>教练</th>
+                                            <th>日期</th>
+                                            <th>时间</th>
+                                            <th>球台</th>
+                                            <th>状态</th>
+                                            <th>费用</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentBookingsTable">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">暂无预约记录</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 选择教练 -->
+                <div id="coachesSection" class="section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>选择教练</h2>
+                        <button class="btn btn-primary" onclick="loadCoaches()">
+                            <i class="fas fa-refresh me-1"></i>刷新
+                        </button>
+                    </div>
+
+                    <!-- 搜索栏 -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="searchCoachName" placeholder="教练姓名">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="searchCoachLevel">
+                                        <option value="">所有级别</option>
+                                        <option value="senior">高级教练</option>
+                                        <option value="intermediate">中级教练</option>
+                                        <option value="junior">初级教练</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="searchCoachGender">
+                                        <option value="">所有性别</option>
+                                        <option value="male">男</option>
+                                        <option value="female">女</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-primary" onclick="searchCoaches()">
+                                        <i class="fas fa-search me-1"></i>搜索
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 教练列表 -->
+                    <div class="row g-4" id="coachList">
+                        <!-- 教练卡片将在这里动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 其他部分... -->
+                <div id="bookingsSection" class="section" style="display: none;">
+                    <h2>我的预约</h2>
+                    <p>预约管理功能正在开发中...</p>
+                </div>
+
+                <div id="accountSection" class="section" style="display: none;">
+                    <h2>账户管理</h2>
+                    <p>账户管理功能正在开发中...</p>
+                </div>
+
+                <div id="matchesSection" class="section" style="display: none;">
+                    <h2>比赛报名</h2>
+                    <p>比赛报名功能正在开发中...</p>
+                </div>
+
+                <div id="profileSection" class="section" style="display: none;">
+                    <h2>个人资料</h2>
+                    <p>个人资料功能正在开发中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 选择教练模态框 -->
+    <div class="modal fade" id="selectCoachModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认选择教练</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定要选择 <span id="selectedCoachName"></span> 作为您的教练吗？</p>
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            每位学员最多可以选择2名教练，选择后需要教练确认。
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmSelectCoach()">确认选择</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // 全局变量
+        const API_BASE_URL = 'http://localhost:5001/api';
+        let currentUser = null;
+        let authToken = null;
+        let selectedCoachId = null;
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查登录状态
+            authToken = localStorage.getItem('authToken');
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+            if (!authToken || currentUser.user_type !== 'student') {
+                alert('请先登录学员账户');
+                window.location.href = '/';
+                return;
+            }
+
+            // 设置请求头
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+
+            // 初始化页面
+            initializePage();
+        });
+
+        // 初始化页面
+        function initializePage() {
+            // 显示用户名
+            document.getElementById('userName').textContent = currentUser.real_name || currentUser.username;
+
+            // 显示当前时间
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            // 加载仪表板数据
+            loadDashboardData();
+        }
+
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString('zh-CN');
+        }
+
+        // 加载仪表板数据
+        async function loadDashboardData() {
+            try {
+                // 加载师生关系
+                const relationsResponse = await axios.get(`${API_BASE_URL}/user/relations`);
+                if (relationsResponse.data.success) {
+                    document.getElementById('coachCount').textContent = relationsResponse.data.data.length;
+                }
+
+                // 加载预约记录
+                const bookingsResponse = await axios.get(`${API_BASE_URL}/booking/my-bookings?per_page=5`);
+                if (bookingsResponse.data.success) {
+                    const bookings = bookingsResponse.data.data.items;
+                    const pendingCount = bookings.filter(b => b.status === 'pending').length;
+                    document.getElementById('pendingBookings').textContent = pendingCount;
+                    displayRecentBookings(bookings);
+                }
+
+                // 加载账户信息
+                const accountResponse = await axios.get(`${API_BASE_URL}/payment/account`);
+                if (accountResponse.data.success) {
+                    document.getElementById('accountBalance').textContent =
+                        '¥' + accountResponse.data.data.balance.toFixed(2);
+                }
+
+                // 计算本月课程数量
+                const thisMonth = new Date().getMonth();
+                const thisYear = new Date().getFullYear();
+                const monthlyLessons = bookings ? bookings.filter(b => {
+                    const bookingDate = new Date(b.booking_date);
+                    return bookingDate.getMonth() === thisMonth &&
+                           bookingDate.getFullYear() === thisYear &&
+                           b.status === 'confirmed';
+                }).length : 0;
+                document.getElementById('monthlyLessons').textContent = monthlyLessons;
+
+            } catch (error) {
+                console.error('加载仪表板数据失败:', error);
+            }
+        }
+
+        // 显示近期预约
+        function displayRecentBookings(bookings) {
+            const tbody = document.getElementById('recentBookingsTable');
+            tbody.innerHTML = '';
+
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">暂无预约记录</td></tr>';
+                return;
+            }
+
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.coach?.real_name || '未知'}</td>
+                    <td>${booking.booking_date}</td>
+                    <td>${booking.start_time} - ${booking.end_time}</td>
+                    <td>${booking.table?.table_number || '待分配'}</td>
+                    <td><span class="badge bg-${getStatusColor(booking.status)}">${getStatusText(booking.status)}</span></td>
+                    <td>¥${booking.lesson_fee}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 获取状态颜色
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'warning',
+                'confirmed': 'success',
+                'cancelled': 'danger',
+                'completed': 'secondary'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const texts = {
+                'pending': '待确认',
+                'confirmed': '已确认',
+                'cancelled': '已取消',
+                'completed': '已完成'
+            };
+            return texts[status] || status;
+        }
+
+        // 显示指定部分
+        function showSection(sectionName) {
+            // 隐藏所有部分
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // 显示指定部分
+            document.getElementById(sectionName + 'Section').style.display = 'block';
+
+            // 更新导航状态
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 根据部分加载数据
+            if (sectionName === 'coaches') {
+                loadCoaches();
+            }
+        }
+
+        // 加载教练列表
+        async function loadCoaches() {
+            try {
+                const params = new URLSearchParams();
+                const name = document.getElementById('searchCoachName')?.value;
+                const level = document.getElementById('searchCoachLevel')?.value;
+                const gender = document.getElementById('searchCoachGender')?.value;
+
+                if (name) params.append('name', name);
+                if (level) params.append('coach_level', level);
+                if (gender) params.append('gender', gender);
+                if (currentUser.campus_id) params.append('campus_id', currentUser.campus_id);
+
+                const response = await axios.get(`${API_BASE_URL}/user/coaches?${params}`);
+                if (response.data.success) {
+                    displayCoaches(response.data.data.items);
+                }
+            } catch (error) {
+                console.error('加载教练列表失败:', error);
+                alert('加载教练列表失败');
+            }
+        }
+
+        // 显示教练列表
+        function displayCoaches(coaches) {
+            const container = document.getElementById('coachList');
+            container.innerHTML = '';
+
+            if (coaches.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">暂无教练数据</div>';
+                return;
+            }
+
+            coaches.forEach(coach => {
+                const coachProfile = coach.coach_profile || {};
+                const card = document.createElement('div');
+                card.className = 'col-md-6 col-lg-4';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <img src="${coachProfile.photo_url || 'https://via.placeholder.com/60'}"
+                                     class="rounded-circle me-3" width="60" height="60" alt="教练头像">
+                                <div>
+                                    <h6 class="card-title mb-1">${coach.real_name}</h6>
+                                    <small class="text-muted">${getLevelText(coachProfile.coach_level)} • ${getGenderText(coach.gender)}</small>
+                                </div>
+                            </div>
+                            <p class="card-text small">${coachProfile.achievements || '暂无成绩介绍'}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-primary">¥${coachProfile.hourly_rate}/小时</strong><br>
+                                    <small class="text-muted">学员: ${coachProfile.current_students}/${coachProfile.max_students}</small>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" onclick="selectCoach(${coach.id}, '${coach.real_name}')">
+                                    选择教练
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 获取级别文本
+        function getLevelText(level) {
+            const levels = {
+                'senior': '高级教练',
+                'intermediate': '中级教练',
+                'junior': '初级教练'
+            };
+            return levels[level] || '未知';
+        }
+
+        // 获取性别文本
+        function getGenderText(gender) {
+            return gender === 'male' ? '男' : gender === 'female' ? '女' : '未知';
+        }
+
+        // 搜索教练
+        function searchCoaches() {
+            loadCoaches();
+        }
+
+        // 选择教练
+        function selectCoach(coachId, coachName) {
+            selectedCoachId = coachId;
+            document.getElementById('selectedCoachName').textContent = coachName;
+            new bootstrap.Modal(document.getElementById('selectCoachModal')).show();
+        }
+
+        // 确认选择教练
+        async function confirmSelectCoach() {
+            try {
+                const response = await axios.post(`${API_BASE_URL}/user/choose-coach`, {
+                    coach_id: selectedCoachId
+                });
+
+                if (response.data.success) {
+                    alert(response.data.message);
+                    bootstrap.Modal.getInstance(document.getElementById('selectCoachModal')).hide();
+                    loadDashboardData(); // 刷新仪表板数据
+                } else {
+                    alert(response.data.message);
+                }
+            } catch (error) {
+                alert(error.response?.data?.message || '选择教练失败');
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教练仪表板 - 乒乓球培训管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../../assets/css/common.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-table-tennis me-2"></i>
+                乒乓球培训管理系统
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar me-2" data-user="avatar">C</div>
+                        <span data-user="name">教练</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>个人资料</a></li>
+                        <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>设置</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" data-action="logout"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="p-3">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="user-avatar me-3" data-user="avatar">C</div>
+                        <div>
+                            <div class="fw-semibold" data-user="name">教练姓名</div>
+                            <small class="text-muted" data-user="type">教练</small>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        仪表板
+                    </a>
+                    <a class="nav-link" href="#" data-page="students">
+                        <i class="fas fa-user-graduate"></i>
+                        我的学员
+                    </a>
+                    <a class="nav-link" href="#" data-page="schedule">
+                        <i class="fas fa-calendar"></i>
+                        课程安排
+                    </a>
+                    <a class="nav-link" href="#" data-page="bookings">
+                        <i class="fas fa-calendar-check"></i>
+                        预约管理
+                    </a>
+                    <a class="nav-link" href="#" data-page="earnings">
+                        <i class="fas fa-dollar-sign"></i>
+                        收入统计
+                    </a>
+                    <a class="nav-link" href="#" data-page="evaluations">
+                        <i class="fas fa-star"></i>
+                        课程评价
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- 仪表板页面 -->
+                <div id="dashboardPage" class="page-content fade-in">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">教练仪表板</h2>
+                        <div class="text-muted">
+                            <i class="fas fa-calendar me-2"></i>
+                            <span id="currentDateTime"></span>
+                        </div>
+                    </div>
+
+                    <!-- 统计卡片 -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="stat-label">我的学员</div>
+                                            <div class="stat-value" id="studentCount">0</div>
+                                        </div>
+                                        <div class="stat-icon success">
+                                            <i class="fas fa-user-graduate"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="stat-label">待确认预约</div>
+                                            <div class="stat-value" id="pendingBookings">0</div>
+                                        </div>
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="stat-label">本月收入</div>
+                                            <div class="stat-value" id="monthlyEarnings">¥0.00</div>
+                                        </div>
+                                        <div class="stat-icon primary">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="stat-label">今日课程</div>
+                                            <div class="stat-value" id="todayLessons">0</div>
+                                        </div>
+                                        <div class="stat-icon info">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 今日课程和快捷操作 -->
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">今日课程安排</h6>
+                                    <a href="#" class="btn btn-sm btn-outline-primary" data-page="schedule">
+                                        查看全部
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div id="todaySchedule">
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                                            今日暂无课程安排
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">快捷操作</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary" data-page="students">
+                                            <i class="fas fa-users me-2"></i>管理学员
+                                        </button>
+                                        <button class="btn btn-success" data-page="bookings">
+                                            <i class="fas fa-calendar-check me-2"></i>确认预约
+                                        </button>
+                                        <button class="btn btn-info" data-page="schedule">
+                                            <i class="fas fa-calendar-plus me-2"></i>安排课程
+                                        </button>
+                                        <button class="btn btn-warning" data-page="earnings">
+                                            <i class="fas fa-chart-bar me-2"></i>查看收入
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">学员申请</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="pendingApplications">
+                                        <div class="text-muted text-center py-3">
+                                            <i class="fas fa-user-clock fa-2x mb-2 d-block"></i>
+                                            暂无待处理申请
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 我的学员页面 -->
+                <div id="studentsPage" class="page-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">我的学员</h2>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" onclick="refreshStudents()">
+                                <i class="fas fa-refresh me-2"></i>刷新
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 学员申请待审核 -->
+                    <div class="card mb-4" id="applicationsCard" style="display: none;">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0 text-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                待审核申请
+                            </h6>
+                        </div>
+                        <div class="card-body" id="applicationsList">
+                            <!-- 申请列表 -->
+                        </div>
+                    </div>
+
+                    <!-- 已确认学员 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">已确认学员</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4" id="studentsList">
+                                <div class="col-12 text-center text-muted py-5">
+                                    <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
+                                    <h5>还没有学员</h5>
+                                    <p>等待学员申请或主动联系学员</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 课程安排页面 -->
+                <div id="schedulePage" class="page-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">课程安排</h2>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="scheduleWeekSelect" onchange="loadSchedule()">
+                                <option value="0">本周</option>
+                                <option value="1">下周</option>
+                                <option value="2">下下周</option>
+                            </select>
+                            <button class="btn btn-outline-primary" onclick="loadSchedule()">
+                                <i class="fas fa-refresh me-2"></i>刷新
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 日程统计 -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="text-primary">
+                                        <i class="fas fa-calendar-week fa-2x mb-2"></i>
+                                    </div>
+                                    <h5 id="weeklyLessons">0</h5>
+                                    <small class="text-muted">本周课程</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="text-success">
+                                        <i class="fas fa-clock fa-2x mb-2"></i>
+                                    </div>
+                                    <h5 id="weeklyHours">0</h5>
+                                    <small class="text-muted">本周课时</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="text-warning">
+                                        <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                                    </div>
+                                    <h5 id="weeklyStudents">0</h5>
+                                    <small class="text-muted">授课学员</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <div class="text-info">
+                                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                    </div>
+                                    <h5 id="weeklyEarnings">¥0</h5>
+                                    <small class="text-muted">本周收入</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 周日程表 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                <span id="scheduleWeekTitle">本周课程安排</span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="120">时间</th>
+                                            <th>周一</th>
+                                            <th>周二</th>
+                                            <th>周三</th>
+                                            <th>周四</th>
+                                            <th>周五</th>
+                                            <th>周六</th>
+                                            <th>周日</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scheduleTableBody">
+                                        <!-- 时间段从早8点到晚10点 -->
+                                        <!-- 动态生成 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 当日详细课程 -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                <span id="todayScheduleTitle">今日课程详情</span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="todayScheduleList">
+                                <!-- 今日课程详情 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预约管理页面 -->
+                <div id="bookingsPage" class="page-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">预约管理</h2>
+                    </div>
+
+                    <!-- 预约列表 -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>学员</th>
+                                            <th>日期时间</th>
+                                            <th>球台</th>
+                                            <th>费用</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bookingsTable">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                                                暂无预约记录
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 收入统计页面 -->
+                <div id="earningsPage" class="page-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">收入统计</h2>
+                    </div>
+
+                    <!-- 收入概览 -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="card stat-card">
+                                <div class="card-body text-center">
+                                    <div class="stat-icon success mx-auto mb-3">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <h3 class="text-success" id="totalEarnings">¥0.00</h3>
+                                    <p class="text-muted mb-0">总收入</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card stat-card">
+                                <div class="card-body text-center">
+                                    <div class="stat-icon primary mx-auto mb-3">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <h3 class="text-primary" id="completedLessons">0</h3>
+                                    <p class="text-muted mb-0">完成课程</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card stat-card">
+                                <div class="card-body text-center">
+                                    <div class="stat-icon info mx-auto mb-3">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <h3 class="text-info" id="averageRating">5.0</h3>
+                                    <p class="text-muted mb-0">平均评分</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 收入趋势图 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">收入趋势</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="earningsChart">
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-chart-line fa-3x mb-3 d-block"></i>
+                                    <h5>收入图表</h5>
+                                    <p>功能正在开发中...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 课程评价页面 -->
+                <div id="evaluationsPage" class="page-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">课程评价</h2>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>学员</th>
+                                            <th>课程日期</th>
+                                            <th>学员评价</th>
+                                            <th>我的评价</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="evaluationsTable">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <i class="fas fa-star fa-2x mb-2 d-block"></i>
+                                                暂无评价记录
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        // 页面特定的变量
+        let currentPage = 'dashboard';
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            setupPageNavigation();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            loadDashboardData();
+        });
+
+        // 设置页面导航
+        function setupPageNavigation() {
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+        }
+
+        // 显示指定页面
+        function showPage(pageName) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+
+            const targetPage = document.getElementById(pageName + 'Page');
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                targetPage.classList.add('fade-in');
+            }
+
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+
+            currentPage = pageName;
+            loadPageData(pageName);
+        }
+
+        // 加载页面数据
+        function loadPageData(pageName) {
+            switch (pageName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'students':
+                    loadStudents();
+                    break;
+                case 'schedule':
+                    loadSchedule();
+                    break;
+                case 'bookings':
+                    loadBookings();
+                    break;
+                case 'earnings':
+                    loadEarnings();
+                    break;
+                case 'evaluations':
+                    loadEvaluations();
+                    break;
+            }
+        }
+
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('zh-CN', options);
+        }
+
+        // 加载仪表板数据
+        async function loadDashboardData() {
+            try {
+                // 加载我的学员数量
+                const studentsResult = await API.get('/user/my-students');
+                if (studentsResult.success) {
+                    const studentCount = studentsResult.data.data.total || 0;
+                    document.getElementById('studentCount').textContent = studentCount;
+                }
+
+                // 加载待确认预约数量
+                const pendingResult = await API.get('/booking/pending');
+                if (pendingResult.success) {
+                    const pendingCount = pendingResult.data.data.length || 0;
+                    document.getElementById('pendingBookings').textContent = pendingCount;
+                }
+
+                // 加载我的预约记录来计算收入
+                const bookingsResult = await API.get('/booking/my-bookings');
+                if (bookingsResult.success) {
+                    const bookings = bookingsResult.data.data.items || [];
+
+                    // 计算本月收入
+                    const thisMonth = new Date().getMonth();
+                    const thisYear = new Date().getFullYear();
+                    const monthlyEarnings = bookings
+                        .filter(b => {
+                            const bookingDate = new Date(b.booking_date);
+                            return bookingDate.getMonth() === thisMonth &&
+                                   bookingDate.getFullYear() === thisYear &&
+                                   b.status === 'completed';
+                        })
+                        .reduce((sum, b) => sum + parseFloat(b.lesson_fee || 0), 0);
+
+                    document.getElementById('monthlyEarnings').textContent = formatCurrency(monthlyEarnings);
+
+                    // 计算今日课程数量
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayLessons = bookings.filter(b =>
+                        b.booking_date === today &&
+                        ['confirmed', 'completed'].includes(b.status)
+                    ).length;
+
+                    document.getElementById('todayLessons').textContent = todayLessons;
+                }
+
+                // 加载今日课程安排
+                loadTodaySchedule();
+                // 加载待处理申请
+                loadPendingApplications();
+            } catch (error) {
+                console.error('加载仪表板数据失败:', error);
+                showToast('加载仪表板数据失败', 'error');
+            }
+        }
+
+        // 加载今日课程
+        async function loadTodaySchedule() {
+            try {
+                const scheduleContainer = document.getElementById('todaySchedule');
+                const today = new Date().toISOString().split('T')[0];
+
+                // 获取今日的预约记录
+                const result = await API.get('/booking/my-bookings');
+                if (result.success) {
+                    const todayLessons = (result.data.data.items || [])
+                        .filter(booking => booking.booking_date === today)
+                        .map(booking => ({
+                            time: `${booking.start_time.slice(0,5)}-${booking.end_time.slice(0,5)}`,
+                            student: booking.student?.real_name || '未知',
+                            table: booking.table?.table_number || '待分配',
+                            status: booking.status
+                        }));
+
+                    if (todayLessons.length === 0) {
+                        scheduleContainer.innerHTML = `
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                                今日暂无课程安排
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    scheduleContainer.innerHTML = todayLessons.map(lesson => `
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <div class="fw-semibold">${lesson.time}</div>
+                                <small class="text-muted">学员: ${lesson.student} | 球台: ${lesson.table}</small>
+                            </div>
+                            <span class="badge bg-${getStatusColor(lesson.status)}">
+                                ${getStatusText(lesson.status)}
+                            </span>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('加载今日课程失败:', error);
+            }
+        }
+
+        // 加载待处理申请
+        async function loadPendingApplications() {
+            try {
+                const applicationsContainer = document.getElementById('pendingApplications');
+
+                // 获取待处理的学员申请
+                const result = await API.get('/user/student-applications');
+                if (result.success) {
+                    const applications = result.data.data || [];
+
+                    if (applications.length === 0) {
+                        applicationsContainer.innerHTML = `
+                            <div class="text-muted text-center py-3">
+                                <i class="fas fa-user-clock fa-2x mb-2 d-block"></i>
+                                暂无待处理申请
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    applicationsContainer.innerHTML = applications.map(app => `
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <div class="fw-semibold">${app.student?.real_name || '未知'}</div>
+                                <small class="text-muted">申请时间: ${formatDate(app.apply_time)}</small>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-success" onclick="approveApplication(${app.id})">同意</button>
+                                <button class="btn btn-danger" onclick="rejectApplication(${app.id})">拒绝</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('加载待处理申请失败:', error);
+            }
+        }
+
+        // 加载学员列表
+        async function loadStudents() {
+            try {
+                const result = await API.get('/user/my-students');
+                if (result.success) {
+                    const students = result.data.data.items || [];
+                    displayStudents(students);
+                }
+            } catch (error) {
+                console.error('加载学员列表失败:', error);
+                showToast('加载学员列表失败', 'error');
+            }
+        }
+
+        // 加载课程安排
+        async function loadSchedule() {
+            try {
+                const weekOffset = parseInt(document.getElementById('scheduleWeekSelect').value) || 0;
+                await loadScheduleForWeek(weekOffset);
+            } catch (error) {
+                console.error('加载课程安排失败:', error);
+                showToast('加载课程安排失败', 'error');
+            }
+        }
+
+        // 加载指定周的课程安排
+        async function loadScheduleForWeek(weekOffset = 0) {
+            try {
+                // 计算目标周的开始和结束日期
+                const now = new Date();
+                const currentDay = now.getDay(); // 0=周日, 1=周一...
+                const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // 计算到周一的偏移
+
+                const startDate = new Date(now);
+                startDate.setDate(now.getDate() + mondayOffset + (weekOffset * 7));
+
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 6);
+
+                // 更新标题
+                const titles = ['本周', '下周', '下下周'];
+                document.getElementById('scheduleWeekTitle').textContent =
+                    `${titles[weekOffset] || '第' + (weekOffset + 1) + '周'}课程安排 (${formatDate(startDate)} - ${formatDate(endDate)})`;
+
+                // 获取该周的预约数据
+                const result = await API.get(`/booking/my-bookings?start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`);
+
+                if (result.success) {
+                    const bookings = (result.data.data.items || []).filter(b => b.status === 'confirmed');
+
+                    // 生成周日程表
+                    generateWeeklyScheduleTable(startDate, bookings);
+
+                    // 更新统计数据
+                    updateWeeklyStats(bookings);
+
+                    // 显示今日/选中日课程详情
+                    const today = new Date();
+                    const todayBookings = bookings.filter(b => {
+                        const bookingDate = new Date(b.booking_date);
+                        return bookingDate.toDateString() === today.toDateString();
+                    });
+                    displayTodaySchedule(todayBookings);
+                }
+            } catch (error) {
+                console.error('加载周课程安排失败:', error);
+                showToast('加载课程安排失败', 'error');
+            }
+        }
+
+        // 生成周日程表
+        function generateWeeklyScheduleTable(startDate, bookings) {
+            const tableBody = document.getElementById('scheduleTableBody');
+            tableBody.innerHTML = '';
+
+            // 生成时间段 (8:00 - 22:00, 每小时一行)
+            for (let hour = 8; hour <= 21; hour++) {
+                const row = document.createElement('tr');
+
+                // 时间列
+                const timeCell = document.createElement('td');
+                timeCell.className = 'fw-semibold bg-light';
+                timeCell.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                row.appendChild(timeCell);
+
+                // 周一到周日的列
+                for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+                    const cell = document.createElement('td');
+                    cell.className = 'schedule-cell';
+                    cell.style.minHeight = '60px';
+                    cell.style.position = 'relative';
+
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.getDate() + dayOffset);
+                    const dateStr = currentDate.toISOString().split('T')[0];
+
+                    // 查找这个时间段的预约
+                    const cellBookings = bookings.filter(booking => {
+                        if (booking.booking_date !== dateStr) return false;
+
+                        const startHour = parseInt(booking.start_time.split(':')[0]);
+                        const endHour = parseInt(booking.end_time.split(':')[0]);
+
+                        return hour >= startHour && hour < endHour;
+                    });
+
+                    if (cellBookings.length > 0) {
+                        cellBookings.forEach(booking => {
+                            const bookingDiv = document.createElement('div');
+                            bookingDiv.className = 'booking-item bg-primary text-white rounded p-1 mb-1';
+                            bookingDiv.style.fontSize = '12px';
+                            bookingDiv.innerHTML = `
+                                <div class="fw-semibold">${booking.start_time.slice(0,5)}-${booking.end_time.slice(0,5)}</div>
+                                <div>${booking.student?.real_name || '未知'}</div>
+                                <div class="text-light">${booking.table?.table_number || '待分配'}</div>
+                            `;
+                            bookingDiv.title = `学员: ${booking.student?.real_name}\n时间: ${booking.start_time}-${booking.end_time}\n球台: ${booking.table?.table_number || '待分配'}\n费用: ${formatCurrency(booking.lesson_fee)}`;
+                            cell.appendChild(bookingDiv);
+                        });
+                    }
+
+                    row.appendChild(cell);
+                }
+
+                tableBody.appendChild(row);
+            }
+        }
+
+        // 更新周统计数据
+        function updateWeeklyStats(bookings) {
+            // 计算课程数量
+            document.getElementById('weeklyLessons').textContent = bookings.length;
+
+            // 计算总课时
+            let totalHours = 0;
+            bookings.forEach(booking => {
+                const start = new Date(`2000-01-01 ${booking.start_time}`);
+                const end = new Date(`2000-01-01 ${booking.end_time}`);
+                totalHours += (end - start) / (1000 * 60 * 60);
+            });
+            document.getElementById('weeklyHours').textContent = totalHours.toFixed(1) + 'h';
+
+            // 计算授课学员数量(去重)
+            const uniqueStudents = new Set(bookings.map(b => b.student_id));
+            document.getElementById('weeklyStudents').textContent = uniqueStudents.size;
+
+            // 计算收入
+            const totalEarnings = bookings.reduce((sum, b) => sum + parseFloat(b.lesson_fee || 0), 0);
+            document.getElementById('weeklyEarnings').textContent = formatCurrency(totalEarnings);
+        }
+
+        // 显示今日课程详情
+        function displayTodaySchedule(todayBookings) {
+            const container = document.getElementById('todayScheduleList');
+
+            if (todayBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                        今日无课程安排
+                    </div>
+                `;
+                return;
+            }
+
+            // 按时间排序
+            todayBookings.sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+            container.innerHTML = todayBookings.map(booking => `
+                <div class="card border-start border-primary border-4 mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div class="h5 text-primary mb-0">${booking.start_time.slice(0,5)}</div>
+                                    <small class="text-muted">到 ${booking.end_time.slice(0,5)}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-2">${(booking.student?.real_name || 'U').charAt(0)}</div>
+                                    <div>
+                                        <div class="fw-semibold">${booking.student?.real_name || '未知学员'}</div>
+                                        <small class="text-muted">${booking.student?.gender === 'male' ? '男' : booking.student?.gender === 'female' ? '女' : ''}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <i class="fas fa-table-tennis text-warning"></i>
+                                    <div class="small">${booking.table?.table_number || '待分配球台'}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div class="text-success fw-semibold">${formatCurrency(booking.lesson_fee)}</div>
+                                    <small class="text-muted">课时费</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewBookingDetail(${booking.id})">
+                                        <i class="fas fa-eye"></i> 详情
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="completeBooking(${booking.id})">
+                                        <i class="fas fa-check"></i> 完成
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看预约详情
+        function viewBookingDetail(bookingId) {
+            showToast('预约详情功能正在开发中', 'info');
+        }
+
+        // 加载预约管理
+        async function loadBookings() {
+            try {
+                const result = await API.get('/booking/my-bookings');
+                if (result.success) {
+                    const bookings = result.data.data.items || [];
+                    displayBookings(bookings);
+                }
+            } catch (error) {
+                console.error('加载预约管理失败:', error);
+                showToast('加载预约管理失败', 'error');
+            }
+        }
+
+        // 加载收入统计
+        async function loadEarnings() {
+            try {
+                // 获取教练的所有完成课程
+                const result = await API.get('/booking/my-bookings?status=completed');
+                if (result.success) {
+                    const completedBookings = result.data.data.items || [];
+
+                    // 计算总收入
+                    const totalEarnings = completedBookings.reduce((sum, booking) => {
+                        return sum + parseFloat(booking.lesson_fee || 0);
+                    }, 0);
+
+                    // 计算完成课程数量
+                    const completedLessons = completedBookings.length;
+
+                    // 暂时设置平均评分（待评价系统完善）
+                    const averageRating = completedLessons > 0 ? '5.0' : '0.0';
+
+                    // 更新页面显示
+                    document.getElementById('totalEarnings').textContent = formatCurrency(totalEarnings);
+                    document.getElementById('completedLessons').textContent = completedLessons;
+                    document.getElementById('averageRating').textContent = averageRating;
+                } else {
+                    // 如果获取失败，显示0
+                    document.getElementById('totalEarnings').textContent = '¥0.00';
+                    document.getElementById('completedLessons').textContent = '0';
+                    document.getElementById('averageRating').textContent = '0.0';
+                }
+            } catch (error) {
+                console.error('加载收入统计失败:', error);
+                // 出错时显示0
+                document.getElementById('totalEarnings').textContent = '¥0.00';
+                document.getElementById('completedLessons').textContent = '0';
+                document.getElementById('averageRating').textContent = '0.0';
+            }
+        }
+
+        // 加载评价记录
+        function loadEvaluations() {
+            showToast('功能正在开发中', 'info');
+        }
+
+        // 同意申请
+        async function approveApplication(applicationId) {
+            if (confirm('确定同意这个学员的申请吗？')) {
+                try {
+                    const result = await API.post(`/user/student-applications/${applicationId}/approve`, {
+                        approve: true
+                    });
+
+                    if (result.success) {
+                        showToast('已同意申请', 'success');
+                        loadPendingApplications();
+                        loadDashboardData();
+                    } else {
+                        showToast(result.message || '处理失败', 'error');
+                    }
+                } catch (error) {
+                    showToast('处理申请失败', 'error');
+                }
+            }
+        }
+
+        // 拒绝申请
+        async function rejectApplication(applicationId) {
+            if (confirm('确定拒绝这个学员的申请吗？')) {
+                try {
+                    const reason = prompt('请输入拒绝原因（可选）：') || '教练拒绝';
+                    const result = await API.post(`/user/student-applications/${applicationId}/approve`, {
+                        approve: false,
+                        reason: reason
+                    });
+
+                    if (result.success) {
+                        showToast('已拒绝申请', 'info');
+                        loadPendingApplications();
+                    } else {
+                        showToast(result.message || '处理失败', 'error');
+                    }
+                } catch (error) {
+                    showToast('处理申请失败', 'error');
+                }
+            }
+        }
+
+        // 刷新学员列表
+        function refreshStudents() {
+            showToast('正在刷新...', 'info');
+            setTimeout(() => {
+                showToast('刷新完成', 'success');
+            }, 1000);
+        }
+
+        // 显示添加课程模态框
+        function showAddScheduleModal() {
+            showToast('功能正在开发中', 'info');
+        }
+
+        // 显示学员列表
+        function displayStudents(students) {
+            const studentsList = document.getElementById('studentsList');
+
+            if (students.length === 0) {
+                studentsList.innerHTML = `
+                    <div class="col-12 text-center text-muted py-5">
+                        <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
+                        <h5>还没有学员</h5>
+                        <p>等待学员申请或主动联系学员</p>
+                    </div>
+                `;
+                return;
+            }
+
+            studentsList.innerHTML = students.map(student => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="user-avatar me-3">${(student.real_name || student.username).charAt(0).toUpperCase()}</div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">${student.real_name || student.username}</h6>
+                                    <p class="text-muted mb-1 small">
+                                        ${student.gender === 'male' ? '男' : student.gender === 'female' ? '女' : '未知'}
+                                        ${student.age ? '• ' + student.age + '岁' : ''}
+                                    </p>
+                                    <small class="text-muted">申请时间: ${formatDate(student.relation_info?.apply_time)}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success">已确认</span>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="viewStudentDetail(${student.id})">详情</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示预约管理
+        function displayBookings(bookings) {
+            const bookingsTable = document.getElementById('bookingsTable');
+
+            if (bookings.length === 0) {
+                bookingsTable.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                            暂无预约记录
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            bookingsTable.innerHTML = bookings.map(booking => `
+                <tr>
+                    <td>${booking.student?.real_name || '未知'}</td>
+                    <td>
+                        ${formatDate(booking.booking_date)}<br>
+                        <small class="text-muted">${booking.start_time.slice(0,5)} - ${booking.end_time.slice(0,5)}</small>
+                    </td>
+                    <td>${booking.table?.table_number || '待分配'}</td>
+                    <td>${formatCurrency(booking.lesson_fee)}</td>
+                    <td>
+                        <span class="badge bg-${getStatusColor(booking.status)}">
+                            ${getStatusText(booking.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            ${booking.status === 'pending' ?
+                                `<button class="btn btn-success" onclick="confirmBooking(${booking.id})">确认</button>
+                                 <button class="btn btn-danger" onclick="rejectBooking(${booking.id})">拒绝</button>` :
+                                booking.status === 'confirmed' ?
+                                `<button class="btn btn-outline-secondary" onclick="completeBooking(${booking.id})">完成</button>` :
+                                '<small class="text-muted">无操作</small>'
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 获取状态颜色（从学员页面复制）
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'warning',
+                'confirmed': 'success',
+                'cancelled': 'danger',
+                'completed': 'secondary'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        // 获取状态文本（从学员页面复制）
+        function getStatusText(status) {
+            const texts = {
+                'pending': '待确认',
+                'confirmed': '已确认',
+                'cancelled': '已取消',
+                'completed': '已完成'
+            };
+            return texts[status] || status;
+        }
+
+        // 确认预约
+        async function confirmBooking(bookingId) {
+            if (confirm('确定要确认这个预约吗？')) {
+                try {
+                    const result = await API.post(`/booking/${bookingId}/confirm`, {
+                        confirm: true
+                    });
+
+                    if (result.success) {
+                        showToast('预约已确认', 'success');
+                        loadBookings();
+                        loadDashboardData();
+                    } else {
+                        showToast(result.message || '确认失败', 'error');
+                    }
+                } catch (error) {
+                    showToast('确认预约失败', 'error');
+                }
+            }
+        }
+
+        // 拒绝预约
+        async function rejectBooking(bookingId) {
+            if (confirm('确定要拒绝这个预约吗？')) {
+                try {
+                    const reason = prompt('请输入拒绝原因（可选）：') || '教练拒绝';
+                    const result = await API.post(`/booking/${bookingId}/confirm`, {
+                        confirm: false,
+                        reason: reason
+                    });
+
+                    if (result.success) {
+                        showToast('预约已拒绝', 'info');
+                        loadBookings();
+                        loadDashboardData();
+                    } else {
+                        showToast(result.message || '拒绝失败', 'error');
+                    }
+                } catch (error) {
+                    showToast('拒绝预约失败', 'error');
+                }
+            }
+        }
+
+        // 完成预约
+        async function completeBooking(bookingId) {
+            if (confirm('确定标记这个预约为已完成吗？')) {
+                try {
+                    const result = await API.post(`/booking/${bookingId}/complete`);
+                    if (result.success) {
+                        showToast('预约已标记为完成', 'success');
+                        loadBookings();
+                        loadDashboardData();
+                    } else {
+                        showToast(result.message || '操作失败', 'error');
+                    }
+                } catch (error) {
+                    showToast('操作失败', 'error');
+                }
+            }
+        }
+
+        // 查看学员详情
+        function viewStudentDetail(studentId) {
+            showToast('学员详情功能正在开发中', 'info');
+        }
+    </script>
+</body>
+</html>
