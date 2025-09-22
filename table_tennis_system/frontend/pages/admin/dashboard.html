@@ -286,6 +286,15 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- 用户分页 -->
+                            <nav aria-label="用户分页" id="usersPagination" style="display: none;">
+                                <ul class="pagination justify-content-center">
+                                    <!-- 分页按钮将在此动态生成 -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
                         </div>
                     </div>
                 </div>
@@ -794,6 +803,7 @@
     <script>
         // 页面特定的变量
         let currentPage = 'dashboard';
+        let currentUserFilters = {};
 
         // 页面加载完成后执行
         document.addEventListener('DOMContentLoaded', function() {
@@ -979,20 +989,39 @@
             return colors[type] || 'secondary';
         }
 
+        // 筛选用户
+        function filterUsers() {
+            currentUserFilters = {
+                user_type: document.getElementById('filterUserType').value,
+                status: document.getElementById('filterStatus').value,
+                search: document.getElementById('searchUser').value
+            };
+            loadUsers(1, currentUserFilters);
+        }
+
         // 加载用户列表
-        async function loadUsers() {
+        async function loadUsers(page = 1, filters = currentUserFilters) {
             try {
-                // 获取所有学员用户
-                const studentsResult = await API.get('/user/students');
-
-                let users = [];
-
-                // 添加学员用户
-                if (studentsResult.success) {
-                    users = users.concat(studentsResult.data.data.items || []);
+                let url = `/user/all?page=${page}`;
+                if (filters.user_type) {
+                    url += `&user_type=${filters.user_type}`;
                 }
+                if (filters.status) {
+                    url += `&status=${filters.status}`;
+                }
+                if (filters.search) {
+                    url += `&search=${filters.search}`;
+                }
+                const result = await API.get(url);
 
-                displayUsers(users);
+                if (result.success) {
+                    const data = result.data.data;
+                    const users = data.items || [];
+                    displayUsers(users);
+                    updateUsersPagination(data, filters);
+                } else {
+                    showToast('加载用户列表失败', 'error');
+                }
 
                 // 加载待审批教练到单独区域
                 loadPendingCoaches();
@@ -1120,11 +1149,46 @@
                             <button class="btn btn-outline-${user.status === 'active' ? 'warning' : 'success'}" onclick="toggleUserStatus(${user.id})">
                                 ${user.status === 'active' ? '禁用' : '启用'}
                             </button>
+                            ${getCurrentUser().user_type === 'super_admin' && user.user_type !== 'super_admin' ? 
+                                `<button class="btn btn-outline-info" onclick="showAssignAdminModal(${user.id}, '${user.username}')">设为校区管理员</button>` : ''}
                         </div>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        // 更新用户分页
+        function updateUsersPagination(data, filters) {
+            const pagination = document.getElementById('usersPagination');
+            if (!data.pages || data.pages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+
+            pagination.style.display = 'block';
+            const ul = pagination.querySelector('.pagination');
+            ul.innerHTML = '';
+
+            // 上一页
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${data.has_prev ? '' : 'disabled'}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" onclick='loadUsers(${data.current_page - 1})'>上一页</a>`;
+            ul.appendChild(prevLi);
+
+            // 页码
+            for (let i = 1; i <= data.pages; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === data.current_page ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick='loadUsers(${i})'>${i}</a>`;
+                ul.appendChild(li);
+            }
+
+            // 下一页
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${data.has_next ? '' : 'disabled'}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" onclick='loadUsers(${data.current_page + 1})'>下一页</a>`;
+            ul.appendChild(nextLi);
         }
 
         // 获取用户类型颜色
@@ -1995,80 +2059,185 @@
 
         function exportUsers() {
             // 实现用户数据导出功能
+            showToast('用户数据导出功能正在开发中', 'info');
+        }
+
+        function editUser(userId) {
+            showToast(`编辑用户功能正在开发中 (用户ID: ${userId})`, 'info');
+        }
+
+        function toggleUserStatus(userId) {
+            showToast(`切换用户状态功能正在开发中 (用户ID: ${userId})`, 'info');
+        }
+
+        /**
+         * 功能：显示一个用于指派校区管理员的模态框（弹窗）。
+         * @param {number} userId - 要被指派的用户的ID。
+         * @param {string} username - 要被指派的用户的名称。
+         */
+        function showAssignAdminModal(userId, username) {
+            // 动态创建模态框的 DOM 元素
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'assignAdminModal'; // 给一个固定的ID，方便后续通过ID找到它
+            modal.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">指派校区管理员</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>将用户 <strong>${username}</strong> 指派为校区管理员。</p>
+                            <div class="mb-3">
+                                <label class="form-label">选择校区</label>
+                                <select class="form-select" id="assignCampusId" required>
+                                    <option value="">请选择校区</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" onclick="assignCampusAdmin(${userId})">确认</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 将创建的模态框添加到 body 中
+            document.body.appendChild(modal);
+
+            // 调用另一个函数来加载校区列表到下拉框中
+            loadCampusForSelect('assignCampusId');
+
+            // 使用 Bootstrap 的 JS API 来初始化并显示模态框
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+
+            // 监听模态框关闭事件，关闭后从 DOM 中移除该元素，避免页面污染
+            modal.addEventListener('hidden.bs.modal', function () {
+                document.body.removeChild(modal);
+            });
+        }
+
+        /**
+         * 功能：向服务器发送请求，将用户指派为校区管理员。
+         * @param {number} userId - 用户的ID。
+         */
+        async function assignCampusAdmin(userId) {
+            const campusId = document.getElementById('assignCampusId').value;
+            if (!campusId) {
+                showToast('请选择一个校区', 'warning');
+                return;
+            }
+
             try {
-                // 获取当前显示的用户数据
-                const table = document.getElementById('usersTable');
+                const result = await API.post(`/user/${userId}/assign-campus-admin`, { campus_id: parseInt(campusId) });
+                if (result.success) {
+                    showToast('已成功指派校区管理员', 'success');
+                    
+                    // 安全地获取并关闭模态框
+                    const modalElement = document.getElementById('assignAdminModal');
+                    if (modalElement) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                    }
+                    loadUsers(); // 重新加载用户列表以更新状态
+                } else {
+                    showToast(result.message || '指派失败', 'error');
+                }
+            } catch (error) {
+                console.error('Assign campus admin failed:', error); // 在控制台打印详细错误
+                showToast('指派失败，请查看控制台获取更多信息', 'error');
+            }
+        }
+
+        /**
+         * 功能：将用户列表导出为 CSV 文件 (目前为模拟功能)。
+         */
+        async function exportUsersToCSV() {
+            try {
+                const table = document.getElementById('userTable'); // 确保页面有 id="userTable" 的表格
+                if (!table) {
+                    showToast('找不到用户数据表格', 'error');
+                    return;
+                }
+
                 const rows = table.querySelectorAll('tr');
 
+                // 如果表格只有表头或没有数据
                 if (rows.length <= 1) {
                     showToast('没有数据可导出', 'warning');
                     return;
                 }
 
-                // 创建CSV内容
+                // CSV 表头
                 let csvContent = '用户名,真实姓名,用户类型,手机号,邮箱,注册时间,状态\n';
 
-                // 模拟数据导出 - 实际项目中应该调用API获取完整数据
+                // --- 模拟导出 ---
                 showToast('正在导出用户数据...', 'info');
 
-                // 模拟导出延迟
+                // 实际功能待开发
                 setTimeout(() => {
                     showToast('用户数据导出功能正在开发中', 'info');
                 }, 1000);
 
             } catch (error) {
-                showToast('导出失败', 'error');
+                console.error('Export failed:', error); // 在控制台打印详细错误
+                showToast('导出失败，请查看控制台获取更多信息', 'error');
             }
         }
 
-        function filterUsers() {
-            // 实现用户筛选功能
-            const userType = document.getElementById('filterUserType').value;
-            const status = document.getElementById('filterStatus').value;
-            const searchText = document.getElementById('searchUser').value;
+        // function filterUsers() {
+        //     // 实现用户筛选功能
+        //     const userType = document.getElementById('filterUserType').value;
+        //     const status = document.getElementById('filterStatus').value;
+        //     const searchText = document.getElementById('searchUser').value;
 
-            showToast('正在筛选用户...', 'info');
+        //     showToast('正在筛选用户...', 'info');
 
-            // 重新加载用户数据时应用筛选条件
-            loadUsersWithFilter(userType, status, searchText);
-        }
+        //     // 重新加载用户数据时应用筛选条件
+        //     loadUsersWithFilter(userType, status, searchText);
+        // }
 
-        // 带筛选条件加载用户
-        async function loadUsersWithFilter(userType = '', status = '', searchText = '') {
-            try {
-                let url = '/user/students';
-                const params = new URLSearchParams();
+        // // 带筛选条件加载用户
+        // async function loadUsersWithFilter(userType = '', status = '', searchText = '') {
+        //     try {
+        //         let url = '/user/students';
+        //         const params = new URLSearchParams();
 
-                if (searchText) {
-                    params.append('name', searchText);
-                }
+        //         if (searchText) {
+        //             params.append('name', searchText);
+        //         }
 
-                if (params.toString()) {
-                    url += '?' + params.toString();
-                }
+        //         if (params.toString()) {
+        //             url += '?' + params.toString();
+        //         }
 
-                const result = await API.get(url);
-                let users = [];
+        //         const result = await API.get(url);
+        //         let users = [];
 
-                if (result.success) {
-                    users = result.data.data.items || [];
+        //         if (result.success) {
+        //             users = result.data.data.items || [];
 
-                    // 客户端筛选（实际项目中应该在服务器端筛选）
-                    if (userType) {
-                        users = users.filter(user => user.user_type === userType);
-                    }
-                    if (status) {
-                        users = users.filter(user => user.status === status);
-                    }
-                }
+        //             // 客户端筛选（实际项目中应该在服务器端筛选）
+        //             if (userType) {
+        //                 users = users.filter(user => user.user_type === userType);
+        //             }
+        //             if (status) {
+        //                 users = users.filter(user => user.status === status);
+        //             }
+        //         }
 
-                displayUsers(users);
-                loadPendingCoaches();
-            } catch (error) {
-                console.error('筛选用户失败:', error);
-                showToast('筛选用户失败', 'error');
-            }
-        }
+        //         displayUsers(users);
+        //         loadPendingCoaches();
+        //     } catch (error) {
+        //         console.error('筛选用户失败:', error);
+        //         showToast('筛选用户失败', 'error');
+        //     }
+        // }
 
         function editUser(userId) {
             showToast('功能正在开发中', 'info');

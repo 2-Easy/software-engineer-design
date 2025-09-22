@@ -182,19 +182,31 @@ CREATE TABLE evaluations (
 );
 
 -- 取消预约限制表
-CREATE TABLE cancellation_limits (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    year_month VARCHAR(7) NOT NULL COMMENT 'Format: YYYY-MM',
-    cancellation_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_month (user_id, year_month),
-    INDEX idx_user_id (user_id),
-    INDEX idx_year_month (year_month)
+-- CREATE TABLE cancellation_limits (
+--     id INT PRIMARY KEY AUTO_INCREMENT,
+--     user_id INT NOT NULL,
+--     `year_month` VARCHAR(7) NOT NULL COMMENT 'Format: YYYY-MM',
+--     cancellation_count INT DEFAULT 0,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--     UNIQUE KEY unique_user_month (user_id, year_month),
+--     INDEX idx_user_id (user_id),
+--     INDEX idx_year_month (year_month)
+-- );
+-- 取消预约限制表 (完全修正版)
+CREATE TABLE `cancellation_limits` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `year_month` VARCHAR(7) NOT NULL COMMENT 'Format: YYYY-MM',
+    `cancellation_count` INT DEFAULT 0,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `unique_user_month` (`user_id`, `year_month`),
+    INDEX `idx_user_id` (`user_id`),
+    INDEX `idx_year_month` (`year_month`)
 );
-
 -- 系统日志表
 CREATE TABLE system_logs (
     id INT PRIMARY KEY AUTO_INCREMENT,

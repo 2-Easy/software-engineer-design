@@ -482,3 +482,87 @@ def get_my_students(current_user):
 
     except Exception as e:
         return error_response(f'获取学员列表失败: {str(e)}')
+
+@user_bp.route('/profile', methods=['PUT'])
+@require_auth()
+def update_user_profile(current_user):
+    """更新用户信息"""
+    try:
+        data = request.get_json()
+        
+        # 可更新的字段
+        updatable_fields = ['real_name', 'gender', 'phone', 'email']
+        
+        for field in updatable_fields:
+            if field in data:
+                setattr(current_user, field, data[field])
+                
+        current_user.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        log_action(current_user.id, 'update_profile', f'更新个人信息', request.remote_addr)
+        
+        return success_response(current_user.to_dict(), '用户信息更新成功')
+        
+    except Exception as e:
+        db.session.rollback()
+        return error_response(f'更新用户信息失败: {str(e)}')
+
+@user_bp.route('/<int:user_id>/assign-campus-admin', methods=['POST'])
+@require_auth(['super_admin'])
+def assign_campus_admin(current_user, user_id):
+    """指派校区管理员"""
+    try:
+        data = request.get_json()
+        campus_id = data.get('campus_id')
+
+        if not campus_id:
+            return error_response('校区ID不能为空')
+
+        user = User.query.get(user_id)
+        if not user:
+            return error_response('用户不存在', 404)
+
+        campus = Campus.query.get(campus_id)
+        if not campus:
+            return error_response('校区不存在', 404)
+
+        user.user_type = 'campus_admin'
+        user.campus_id = campus_id
+        user.updated_at = datetime.utcnow()
+        db.session.commit()
+
+        log_action(current_user.id, 'assign_campus_admin', f'将用户 {user.username} 指派为校区 {campus.name} 的管理员', request.remote_addr)
+
+        return success_response(user.to_dict(), '已成功指派校区管理员')
+
+    except Exception as e:
+        db.session.rollback()
+        return error_response(f'指派校区管理员失败: {str(e)}')
+
+@user_bp.route('/all', methods=['GET'])
+@require_auth(['super_admin'])
+def get_all_users(current_user):
+    """获取所有用户列表（超级管理员）"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        user_type = request.args.get('user_type')
+        status = request.args.get('status')
+        search = request.args.get('search')
+
+        query = User.query
+
+        if user_type:
+            query = query.filter(User.user_type == user_type)
+        if status:
+            query = query.filter(User.status == status)
+        if search:
+            query = query.filter(User.username.like(f'%{search}%') | User.real_name.like(f'%{search}%'))
+
+        result = paginate_query(query, page, per_page)
+
+        return success_response(result)
+
+    except Exception as e:
+        return error_response(f'获取所有用户失败: {str(e)}')
