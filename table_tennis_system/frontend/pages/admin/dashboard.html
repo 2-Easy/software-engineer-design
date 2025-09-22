@@ -295,8 +295,6 @@
                             </nav>
                         </div>
                     </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 预约管理页面 -->
@@ -2190,54 +2188,54 @@
             }
         }
 
-        // function filterUsers() {
-        //     // 实现用户筛选功能
-        //     const userType = document.getElementById('filterUserType').value;
-        //     const status = document.getElementById('filterStatus').value;
-        //     const searchText = document.getElementById('searchUser').value;
+        function filterUsers() {
+            // 实现用户筛选功能
+            const userType = document.getElementById('filterUserType').value;
+            const status = document.getElementById('filterStatus').value;
+            const searchText = document.getElementById('searchUser').value;
 
-        //     showToast('正在筛选用户...', 'info');
+            showToast('正在筛选用户...', 'info');
 
-        //     // 重新加载用户数据时应用筛选条件
-        //     loadUsersWithFilter(userType, status, searchText);
-        // }
+            // 重新加载用户数据时应用筛选条件
+            loadUsersWithFilter(userType, status, searchText);
+        }
 
-        // // 带筛选条件加载用户
-        // async function loadUsersWithFilter(userType = '', status = '', searchText = '') {
-        //     try {
-        //         let url = '/user/students';
-        //         const params = new URLSearchParams();
+        // 带筛选条件加载用户
+        async function loadUsersWithFilter(userType = '', status = '', searchText = '') {
+            try {
+                let url = '/user/students';
+                const params = new URLSearchParams();
 
-        //         if (searchText) {
-        //             params.append('name', searchText);
-        //         }
+                if (searchText) {
+                    params.append('name', searchText);
+                }
 
-        //         if (params.toString()) {
-        //             url += '?' + params.toString();
-        //         }
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
 
-        //         const result = await API.get(url);
-        //         let users = [];
+                const result = await API.get(url);
+                let users = [];
 
-        //         if (result.success) {
-        //             users = result.data.data.items || [];
+                if (result.success) {
+                    users = result.data.data.items || [];
 
-        //             // 客户端筛选（实际项目中应该在服务器端筛选）
-        //             if (userType) {
-        //                 users = users.filter(user => user.user_type === userType);
-        //             }
-        //             if (status) {
-        //                 users = users.filter(user => user.status === status);
-        //             }
-        //         }
+                    // 客户端筛选（实际项目中应该在服务器端筛选）
+                    if (userType) {
+                        users = users.filter(user => user.user_type === userType);
+                    }
+                    if (status) {
+                        users = users.filter(user => user.status === status);
+                    }
+                }
 
-        //         displayUsers(users);
-        //         loadPendingCoaches();
-        //     } catch (error) {
-        //         console.error('筛选用户失败:', error);
-        //         showToast('筛选用户失败', 'error');
-        //     }
-        // }
+                displayUsers(users);
+                loadPendingCoaches();
+            } catch (error) {
+                console.error('筛选用户失败:', error);
+                showToast('筛选用户失败', 'error');
+            }
+        }
 
         function editUser(userId) {
             showToast('功能正在开发中', 'info');
