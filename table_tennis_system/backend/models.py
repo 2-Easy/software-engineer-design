@@ -86,7 +86,8 @@ class Campus(db.Model):
     contact_phone = db.Column(db.String(20))
     contact_email = db.Column(db.String(100))
     campus_type = db.Column(db.Enum('center', 'branch'), default='branch')
-    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # manager_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id', use_alter=True, name='fk_campus_manager_id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # 关系
